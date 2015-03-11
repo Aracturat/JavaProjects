@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<project name="LOGO World" default="dist">
+
+    <description>Simple LOGO world.</description>
+
+    <target name="get_properties" description="Get properties">
+        <property file="ant.properties" />
+        <echo>Imported Properties</echo>
+    </target>
+
+    <target name="init" depends="clean">
+        <tstamp/>
+        <mkdir dir="${buildDir}"/>
+        <mkdir dir="${distDir}"/>
+    </target>
+
+    <target name="compile" depends="get_properties, init">
+        <javac srcdir="${srcDir}" destdir="${buildDir}" includeantruntime="false">
+            <classpath refid="classpath.compile"/>
+        </javac>
+        <copy file="src/factory.properties" tofile="${buildDir}/factory.properties" />
+        <copy file="src/log4j.properties" tofile="${buildDir}/log4j.properties" />
+        <copy file="${libDir}/log4j.jar" tofile="${buildDir}/lib/log4j.jar" />
+        <copy todir="${buildDir}">
+            <fileset dir="${libDir}"/>
+        </copy>
+    </target>
+
+    <target name="dist" depends="compile">
+        <jar destfile="${distDir}/game.jar" basedir="${buildDir}">
+            <manifest>
+                <attribute name="Built-By" value= "Aracturat"/>
+                <attribute name="Main-Class" value= "Game.Main"/>
+            </manifest>
+        </jar>
+        <jar destfile="${distDir}/package-src.jar" basedir="${srcDir}"/>
+    </target>
+
+    <target name="clean" depends="get_properties">
+        <delete dir="${buildDir}" />
+        <delete dir="${distDir}" />
+    </target>
+
+    <path id="classpath.compile">
+        <pathelement location="./lib/log4j.jar" />
+    </path>
+
+    <target name="run" depends="dist">
+        <java jar="${distDir}/game.jar" fork="true" >
+            <classpath refid="classpath.compile" />
+        </java>
+    </target>
+
+</project>
